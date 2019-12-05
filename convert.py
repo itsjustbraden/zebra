@@ -1,6 +1,6 @@
 import json
 
-car = open("mini_geometry.json")
+car = open("data\\mini_geometry.json")
 
 carBox = car.read()
 carBox = json.loads(carBox)
@@ -35,4 +35,8 @@ while i < len(vertData):
 vert = vert[:-2]
 norm = norm[:-3]
 tx = tx[:-4]
-print(vert, norm, tx, sep = "\n")
+
+done = open("data\\mini_geometry.obj", mode = "w")
+done.write(vert + "\n" + norm + "\n" + tx)
+
+done.close()
