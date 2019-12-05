@@ -48,10 +48,10 @@ class Camera():
         self._ratio = ratio
         self.build_projection()
 
-        self._camera_position = Vector3([0.0, 0.0, -40.0])
+        self.camera_position = Vector3([0.0, 0.0, -40.0])
         self._camera_front = Vector3([0.0, 0.0, 1.0])
         self._camera_up = Vector3([0.0, 1.0, 0.0])
-        self._cameras_target = (self._camera_position + self._camera_front)
+        self._cameras_target = (self.camera_position + self._camera_front)
         self.build_look_at()
 
     def zoom_in(self):
@@ -63,27 +63,27 @@ class Camera():
         self.build_projection()
 
     def move_forward(self):
-        self._camera_position = self._camera_position + self._camera_front * self._move_horizontally
+        self.camera_position = self.camera_position + self._camera_front * self._move_horizontally
         self.build_look_at()
 
     def move_backwards(self):
-        self._camera_position = self._camera_position - self._camera_front * self._move_horizontally
+        self.camera_position = self.camera_position - self._camera_front * self._move_horizontally
         self.build_look_at()
 
     def strafe_left(self):
-        self._camera_position = self._camera_position - vector.normalize(self._camera_front ^ self._camera_up) * self._move_horizontally
+        self.camera_position = self.camera_position - vector.normalize(self._camera_front ^ self._camera_up) * self._move_horizontally
         self.build_look_at()
 
     def strafe_right(self):
-        self._camera_position = self._camera_position + vector.normalize(self._camera_front ^ self._camera_up) * self._move_horizontally
+        self.camera_position = self.camera_position + vector.normalize(self._camera_front ^ self._camera_up) * self._move_horizontally
         self.build_look_at()
 
     def strafe_up(self):
-        self._camera_position = self._camera_position + self._camera_up * self._move_vertically
+        self.camera_position = self.camera_position + self._camera_up * self._move_vertically
         self.build_look_at()
 
     def strafe_down(self):
-        self._camera_position = self._camera_position - self._camera_up * self._move_vertically
+        self.camera_position = self.camera_position - self._camera_up * self._move_vertically
         self.build_look_at()
 
     def rotate_left(self):
@@ -97,9 +97,9 @@ class Camera():
         self.build_look_at()
 
     def build_look_at(self):
-        self._cameras_target = (self._camera_position + self._camera_front)
+        self._cameras_target = (self.camera_position + self._camera_front)
         self.mat_lookat = Matrix44.look_at(
-            self._camera_position,
+            self.camera_position,
             self._cameras_target,
             self._camera_up)
 
