@@ -39,7 +39,7 @@ class Camera():
 
         self._field_of_view_degrees = 60.0
         self._z_near = 0.01
-        self._z_far = 50
+        self._z_far = 35
         self._ratio = ratio
         self.build_projection()
 
@@ -131,6 +131,8 @@ class ZebraWorld(Example):
 
                 uniform mat4 Mvp;
 
+                uniform vec2 camera_position;
+
                 in vec2 in_vert;
                 out vec2 v_text;
 
@@ -159,7 +161,7 @@ class ZebraWorld(Example):
                 void main() {
                     float XYScale = 20.0;
                     float ZScale = 1.0 / 20.0;
-                    vec4 vertex = vec4(in_vert-0.5, noise(in_vert * XYScale) * ZScale, 1.0); //TODO: Generate procedurally based on camera position
+                    vec4 vertex = vec4(in_vert-0.5+camera_position, noise((in_vert + camera_position) * XYScale) * ZScale, 1.0); //Infinite Generation. Might want to work on it to make it less...wavey.
                     gl_Position = Mvp * vertex;
                                 }
                             ''',
@@ -188,6 +190,7 @@ class ZebraWorld(Example):
         #Passing in of uniforms
         self.mvp = self.prog['Mvp']
         self.time = self.prog['time']
+        self.camera_position = self.prog['camera_position']
 
         vertices, index = terrain(64)
 
@@ -294,6 +297,7 @@ class ZebraWorld(Example):
 
         self.mvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
         self.time.write(np.float32(time*0.2).astype('f4').tobytes())
+        self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
         self.vao.render(moderngl.LINE_STRIP)
 
 
