@@ -294,15 +294,9 @@ class ZebraWorld(Example):
         self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
-        proj = Matrix44.perspective_projection(45.0, self.aspect_ratio, 0.1, 1000.0)
-        lookat = Matrix44.look_at(
-            (0.4, 0.4, .8),
-            (0.0, 0.0, 0.1),
-            (0.0, 0.0, 1.0),
-        )
 
         self.mvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
-        self.time.write(np.float32(time*0.2).astype('f4').tobytes())
+        self.time.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
         self.vao.render(moderngl.LINE_STRIP)
         
