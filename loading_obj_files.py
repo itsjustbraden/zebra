@@ -11,8 +11,8 @@ class LoadingOBJ(Example):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.obj = self.load_scene('mini_geometry.obj')
-        self.texture = self.load_texture_2d('mini_body_diffuse.png')
+        self.obj = self.load_scene('ZEBRA.obj')
+        self.texture = self.load_texture_2d('ZEBRA.jpg')
 
         self.prog = self.ctx.program(
             vertex_shader='''
