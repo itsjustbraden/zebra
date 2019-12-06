@@ -192,16 +192,22 @@ class ZebraWorld(Example):
         self.time = self.prog['time']
         self.camera_position = self.prog['camera_position']
 
+        #Polygon counts, vertex / index bufferig
         vertices, index = terrain(512)
-
         self.vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
         self.ibo = self.ctx.buffer(index.astype('i4').tobytes())
-
         vao_content = [
             (self.vbo, '2f', 'in_vert'),
         ]
-
         self.vao = self.ctx.vertex_array(self.prog, vao_content, self.ibo)
+
+        #Object input
+        '''
+        self.obj = self.load_scene('Zebra_OBJ.obj')
+        self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
+        self.vao2 = self.obj.root_nodes[0].mesh.vao.instance(self.prog) FIRST ROOT NODE. BRADEN KNOWS HOW TO DO THIS, I THINK
+        '''
+
 
         #Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
@@ -299,6 +305,8 @@ class ZebraWorld(Example):
         self.time.write(np.float32(time*0.2).astype('f4').tobytes())
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
         self.vao.render(moderngl.LINE_STRIP)
+        
+        #self.vao2.render() Uncomment after object loads
 
 
 if __name__ == '__main__':
