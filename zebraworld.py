@@ -43,7 +43,7 @@ class Camera():
         self._ratio = ratio
         self.build_projection()
 
-        self.camera_position = Vector3([-.1, 0.03, .04]) #Default camera values
+        self.camera_position = Vector3([-.1, 0.03, -.04]) #Default camera values
         self._camera_front = Vector3([0.0, 1.0, 0.0])
         self._camera_up = Vector3([0.0, 0.0, -1.0])
         self._cameras_target = (self.camera_position + self._camera_front)
@@ -167,8 +167,6 @@ class ZebraWorld(Example):
             fragment_shader='''
                 #version 330
 
-                uniform sampler2D Heightmap;
-
                 uniform sampler2D Color1;
                 uniform sampler2D Color2;
 
@@ -201,8 +199,6 @@ class ZebraWorld(Example):
         ]
 
         self.vao = self.ctx.vertex_array(self.prog, vao_content, self.ibo)
-        self.tex0 = self.load_texture_2d('heightmap.jpg')
-        self.tex0.build_mipmaps()
 
         #Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
@@ -288,8 +284,6 @@ class ZebraWorld(Example):
 
         self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
-
-        self.tex0.use(0)
 
         proj = Matrix44.perspective_projection(45.0, self.aspect_ratio, 0.1, 1000.0)
         lookat = Matrix44.look_at(

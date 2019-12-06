@@ -1,7 +1,6 @@
-[submodule "moderngl"]
-	   path = origin/master
-	   url = https://github.com/moderngl/moderngl.git
-
 [submodule "webgl-noise"]
-	   path = origin/master
-	   url = https://github.com/ashima/webgl-noise.git
+	path = webgl-noise
+	url = https://github.com/ashima/webgl-noise.git
+[submodule "moderngl"]
+	path = moderngl
+	url = https://github.com/moderngl/moderngl.git
