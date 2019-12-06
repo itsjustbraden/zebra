@@ -162,20 +162,22 @@ class PerspectiveProjection(Example):
         self.vao = self.ctx.simple_vertex_array(self.prog, self.vbo, 'in_vert')
 
         self.states = {
-            self.wnd.keys.W: False,     # forward
-            self.wnd.keys.S: False,     # backwards
-            self.wnd.keys.UP: False,    # strafe Up
-            self.wnd.keys.DOWN: False,  # strafe Down
-            self.wnd.keys.A: False,     # strafe left
-            self.wnd.keys.D: False,     # strafe right
-            self.wnd.keys.Q: False,     # rotate left
-            self.wnd.keys.E: False,     # rotare right
-            self.wnd.keys.Z: False,     # zoom in
-            self.wnd.keys.X: False,     # zoom out
+            self.wnd.keys.W: False,     
+            self.wnd.keys.S: False,     
+            self.wnd.keys.UP: False,    
+            self.wnd.keys.DOWN: False,  
+            self.wnd.keys.A: False,     
+            self.wnd.keys.D: False,     
+            self.wnd.keys.Q: False,     
+            self.wnd.keys.E: False,     
+            self.wnd.keys.Z: False,    
+            self.wnd.keys.X: False,     
+            self.wnd.keys.T: False,
         }
 
     def move_camera(self):
         if self.states.get(self.wnd.keys.W):
+            print("fuck")
             self.camera.move_forward()
 
         if self.states.get(self.wnd.keys.S):
@@ -204,6 +206,13 @@ class PerspectiveProjection(Example):
 
         if self.states.get(self.wnd.keys.X):
             self.camera.zoom_out()
+        
+        if self.states.get(self.wnd.keys.T):
+            #self.states(self.wnd.keys.T) = not self.state(self.wnd.keys.T)
+            print("fuck")
+            self.wnd.keys.W = not self.states.get(self.wnd.keys.W)
+
+            self.build_look_at()
 
     def key_event(self, key, action, modifiers):
         if key not in self.states:
@@ -226,4 +235,4 @@ class PerspectiveProjection(Example):
 
 
 if __name__ == '__main__':
-    PerspectiveProjection.run()
+    PerspectiveProjection.run();
