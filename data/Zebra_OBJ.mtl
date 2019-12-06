@@ -1,0 +1,47 @@
+newmtl cebra:blinn1SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.48 0.48 0.46
+Tf 1.00 1.00 1.00
+
+Ni 1.00
+Ks 0.10 0.10 0.10
+newmtl cebra:blinn2SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.31 0.31 0.30
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl cebra:blinn6SG
+illum 4
+Kd 1.00 1.00 1.00
+Ka 0.27 0.27 0.27
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+newmtl cebra:lambert3SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl cebra:lambert5SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.18 0.18 0.18
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl cebra:lambert6SG
+illum 4
+Kd 1.00 0.75 0.70
+Ka 0.41 0.41 0.41
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl cebra:phong1SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 1.00 1.00 1.00
+Ns 32.40
