@@ -18,7 +18,7 @@ import numpy as np
 from pyrr import Matrix44, Quaternion, Vector3, vector
 
 import moderngl
-from ported._example import Example #Bsae class for our world
+from ported._example import Example #Base class for our world
 
 
 def terrain(size):
@@ -159,7 +159,7 @@ class ZebraWorld(Example):
                 void main() {
                     float XYScale = 20.0;
                     float ZScale = 1.0 / 20.0;
-                    vec4 vertex = vec4(in_vert, noise(in_vert * XYScale) * ZScale, 1.0); //TODO: Generate procedurally based on camera position
+                    vec4 vertex = vec4(in_vert-0.5, noise(in_vert * XYScale) * ZScale, 1.0); //TODO: Generate procedurally based on camera position
                     gl_Position = Mvp * vertex;
                                 }
                             ''',
