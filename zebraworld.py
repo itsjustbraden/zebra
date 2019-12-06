@@ -160,7 +160,7 @@ float noise (in vec2 st) {
 void main() {
     float XYScale = 20.0;
     float ZScale = 1.0 / 20.0;
-                    vec4 vertex = vec4(in_vert, noise(in_vert * XYScale) * ZScale, 1.0); //Vertex shader based on the Heightmap.jpg. To be replaced with our own noise function and tesselated values
+                    vec4 vertex = vec4(in_vert - 0.5, noise(in_vert * XYScale) * ZScale, 1.0); //Vertex shader based on the Heightmap.jpg. To be replaced with our own noise function and tesselated values
                     gl_Position = Mvp * vertex;
                     v_text = in_vert;
                 }
@@ -185,7 +185,7 @@ void main() {
                 void main() {
 
                     f_color = vec4(sin(time*4), cos(time*4), .4, 1.0); //Change color over time
-                    f_color = vec4(1.0,1.0,1.0,1.0); //Make color black & white
+                    //f_color = vec4(1.0,1.0,1.0,1.0); //Make color black & white
                 }
             ''',
         )
