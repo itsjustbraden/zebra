@@ -12,8 +12,8 @@ def terrain(size):
     return vertices, index
 
 
-class MultiTextireTerrain(Example):
-    title = "Multitexture Terrain"
+class Zebra(Example):
+    title = "zebra"
     gl_version = (3, 3)
 
     def __init__(self, **kwargs):
@@ -54,7 +54,7 @@ class MultiTextireTerrain(Example):
 
                 void main() {
 
-                    f_color = vec4(sin(time), cos(time), .1, 1.0);
+                    f_color = vec4(sin(time*4), cos(time*4), .1, 1.0);
                 }
             ''',
         )
@@ -62,7 +62,7 @@ class MultiTextireTerrain(Example):
         self.mvp = self.prog['Mvp']
         self.time = self.prog['time']
 
-        vertices, index = terrain(32)
+        vertices, index = terrain(64)
 
         self.vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
         self.ibo = self.ctx.buffer(index.astype('i4').tobytes())
@@ -79,7 +79,7 @@ class MultiTextireTerrain(Example):
 
     def render(self, time, frame_time):
         angle = time * 0.2
-        self.ctx.clear(1.0, 1.0, 1.0)
+        self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
         
@@ -88,15 +88,15 @@ class MultiTextireTerrain(Example):
 
         proj = Matrix44.perspective_projection(45.0, self.aspect_ratio, 0.1, 1000.0)
         lookat = Matrix44.look_at(
-            (np.cos(angle), np.sin(angle), 0.8),
+            (0.4, 0.4, .8),
             (0.0, 0.0, 0.1),
             (0.0, 0.0, 1.0),
         )
 
         self.mvp.write((proj * lookat).astype('f4').tobytes())
         self.time.write(np.float32(time*0.2).astype('f4').tobytes())
-        self.vao.render(moderngl.LINES)
+        self.vao.render(moderngl.LINE_STRIP)
 
 
 if __name__ == '__main__':
-    MultiTextireTerrain.run()
+    Zebra.run()
