@@ -10,7 +10,7 @@ Various Citations:
 1)  2D Noise based on Morgan McGuire @morgan3d
     https://www.shadertoy.com/view/4dS3Wd
 
-2)  ModernGL tempalte projects
+2)  ModernGL template projects
     https://github.com/moderngl/moderngl
 '''
 
@@ -192,7 +192,7 @@ class ZebraWorld(Example):
         self.time = self.prog['time']
         self.camera_position = self.prog['camera_position']
 
-        vertices, index = terrain(64)
+        vertices, index = terrain(512)
 
         self.vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
         self.ibo = self.ctx.buffer(index.astype('i4').tobytes())
@@ -307,13 +307,11 @@ if __name__ == '__main__':
 
 #To Do:
 '''
-1) Noise generator
-2) Procedural generation, infinte world.
 3) Put in objects (both car & zebra)
-4) Automate movement?
 
 Other Ideas:
 Non-skeletal world
 Lighting / color bleed. Environment map
 Change car perspective
+Prevent collision
 '''
