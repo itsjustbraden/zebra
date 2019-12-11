@@ -61,30 +61,20 @@ void main() {
     vec3 texcolor = texture(Texture, v_text).rgb;
     vec3 LightFR = v_vert;
     LightFR.x += 0.1;
+
+    float XYScale = 20.0;
+    float ZScale = 1.0 / 20.0;
+    
+    float ground = noise((Light.xy) * XYScale) * ZScale;
+    float dist = abs(Light.z - ground);
+    dist *= dist * 100.0;
+
     float lum = clamp(dot(normalize(LightFR - v_vert), normalize(v_norm)), 0.0, 1.0) * 0.5 + 0.1;
+    lum /= dist;
+    lum = clamp(lum, 0.0, 1.0);
     vec3 ambient = vec3(1.0,1.0,1.0) * .3;
     vec3 color = vec3(sin(time*4), cos(time*4), 0.6);
     f_color = vec4((ambient * texcolor) + (lum*color*texcolor), 1.0);
-    
-    /*
-    float XYScale = 20.0;
-    float ZScale = 1.0 / 20.0;
-    vec3 texcolor = texture(Texture, v_text).rgb;
-
-    vec3 LightFR = v_vert;
-    //LightFR.z = noise((Light.xy) * XYScale) * ZScale;
-    LightFR.z = 0;
-    LightFR.x += 0.1;
-
-    float light_distance = distance(LightFR, v_vert) * 10;
-    light_distance = light_distance * light_distance;
-
-    float lum = clamp(dot(normalize(LightFR - v_vert), normalize(v_norm)), 0.0, 1.0) * 0.5 + 0.1;
-    lum /= light_distance;
-    vec3 color = vec3(sin(time*4), cos(time*4), 0.6);
-    vec3 ambient = vec3(1.0,1.0,1.0) * .3;
-    f_color = vec4((ambient * texcolor) + (lum*color*texcolor), 1.0) * v_vert.x;
-    */
 }
 
 
