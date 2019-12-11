@@ -32,8 +32,11 @@ class Camera():
         self._zoom_step = 0.2 #Camera speeds
         self._move_vertically = 0.001
         self._move_horizontally = 0.001
-        self._rotate_horizontally = 0.5
+        self._rotate_horizontally = -0.02
         self._rotate_vertically = 0.02
+
+        self.angle = 0
+        self.dist = 0.1
 
         self._field_of_view_degrees = 60.0
         self._z_near = 0.01
@@ -56,19 +59,19 @@ class Camera():
         self.build_projection()
 
     def move_forward(self):
-        self.camera_position = self.camera_position + self.camera_front * self._move_horizontally
+        self.camera_position = self.camera_position + Vector3([np.cos(self.angle),np.sin(self.angle), 0.0 ]) * self._move_horizontally
         self.build_look_at()
 
     def move_backwards(self):
-        self.camera_position = self.camera_position - self.camera_front * self._move_horizontally
+        self.camera_position = self.camera_position - Vector3([np.cos(self.angle),np.sin(self.angle), 0.0 ]) * self._move_horizontally
         self.build_look_at()
 
     def strafe_left(self):
-        self.camera_position = self.camera_position - vector.normalize(self.camera_front ^ self._camera_up) * self._move_horizontally
+        self.camera_position = self.camera_position - Vector3([np.cos(self.angle + np.pi / 2),np.sin(self.angle + np.pi / 2), 0.0 ]) * self._move_horizontally
         self.build_look_at()
 
     def strafe_right(self):
-        self.camera_position = self.camera_position + vector.normalize(self.camera_front ^ self._camera_up) * self._move_horizontally
+        self.camera_position = self.camera_position + Vector3([np.cos(self.angle + np.pi / 2),np.sin(self.angle + np.pi / 2), 0.0 ]) * self._move_horizontally
         self.build_look_at()
 
     def strafe_up(self):
@@ -88,14 +91,19 @@ class Camera():
         self.build_look_at()
     
     def rotate_left(self):
-        rotation = Quaternion.from_z_rotation(-2 * float(self._rotate_horizontally) * np.pi / 180)
-        self.camera_front = rotation * self.camera_front
+        self.angle += self._rotate_horizontally
         self.build_look_at()
 
     def rotate_right(self):
+        self.angle -= self._rotate_horizontally
+        self.build_look_at()
+
+
+        '''
         rotation = Quaternion.from_z_rotation(2 * float(self._rotate_horizontally) * np.pi / 180)
         self.camera_front = rotation * self.camera_front
         self.build_look_at()
+        '''
 
     def slow_rotate_right(self):
         rotation = Quaternion.from_z_rotation(2 * .2 * np.pi / 180)
@@ -103,10 +111,12 @@ class Camera():
         self.build_look_at()
     
     def build_look_at(self):
-        self._cameras_target = (self.camera_position + self.camera_front)
+        self._camera_dist = Vector3([np.cos(self.angle), np.sin(self.angle), 0]) * self.dist
+        self.camera_target = self.camera_position - self._camera_dist
+        self.camera_target.z -= 0.04
         self.mat_lookat = Matrix44.look_at(
+            self.camera_target,
             self.camera_position,
-            self._cameras_target,
             self._camera_up)
 
     def build_projection(self):
@@ -248,6 +258,7 @@ class Tessellation(Example):
         self.zprog = self.load_program('zebra.glsl')
         self.zlight = self.zprog['Light']
         self.zmvp = self.zprog['Mvp']
+        self.zrotate = self.zprog['Rotate']
 
         self.obj = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
         self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
@@ -349,8 +360,7 @@ class Tessellation(Example):
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
         self.vao.render(moderngl.PATCHES)
 
-        self.zmvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
-        self.zlight.write((self.camera.camera_position + self.camera.camera_front).astype('f4').tobytes())
+
         self.texture.use()
         self.vao2.render() #Uncomment after object loads
 

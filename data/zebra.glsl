@@ -9,14 +9,17 @@ in vec3 in_norm;
 in vec2 in_tex;
 
 uniform vec3 Light;
+uniform mat4 Rotate;
 
 out vec3 v_vert;
 out vec3 v_norm;
 out vec2 v_text;
 
 void main() {
-    gl_Position = Mvp * vec4((in_vert / 100.0) + Light, 1.0);
-    v_vert = in_vert / 100.0;
+    vec3 my_vert = (in_vert / 128.0);
+    v_vert = my_vert;
+    my_vert = (Rotate * vec4(my_vert, 1.0)).xyz;
+    gl_Position = Mvp * vec4(my_vert + Light, 1.0);
     v_norm = in_norm;
     v_text = in_tex;
 }
