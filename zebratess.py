@@ -44,7 +44,7 @@ class Camera():
         self._ratio = ratio
         self.build_projection()
 
-        self.camera_position = Vector3([-.1, 0.03, -.04]) #Default camera values
+        self.camera_position = Vector3([-.1, 0.03, -.06]) #Default camera values
         self.camera_front = Vector3([0.0, 1.0, 0.0])
         self._camera_up = Vector3([0.0, 0.0, -1.0])
         self._cameras_target = (self.camera_position + self.camera_front)
@@ -259,6 +259,7 @@ class Tessellation(Example):
         self.zlight = self.zprog['Light']
         self.zmvp = self.zprog['Mvp']
         self.zrotate = self.zprog['Rotate']
+        self.ztime = self.zprog['time']
 
         self.obj = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
         self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
@@ -360,9 +361,9 @@ class Tessellation(Example):
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
         self.vao.render(moderngl.PATCHES)
 
-        
         self.zmvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
         self.zlight.write((self.camera.camera_position).astype('f4').tobytes())
+        self.ztime.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
 
         rotateMyZebra = Matrix44.from_translation([0, -0.05, 0])
         rotateMyZebra = Matrix44.from_x_rotation(np.pi / 2) * rotateMyZebra
