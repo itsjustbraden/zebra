@@ -42,9 +42,9 @@ class Camera():
         self.build_projection()
 
         self.camera_position = Vector3([-.1, 0.03, -.04]) #Default camera values
-        self._camera_front = Vector3([0.0, 1.0, 0.0])
+        self.camera_front = Vector3([0.0, 1.0, 0.0])
         self._camera_up = Vector3([0.0, 0.0, -1.0])
-        self._cameras_target = (self.camera_position + self._camera_front)
+        self._cameras_target = (self.camera_position + self.camera_front)
         self.build_look_at()
 
     def zoom_in(self): #Possible movements
@@ -56,19 +56,19 @@ class Camera():
         self.build_projection()
 
     def move_forward(self):
-        self.camera_position = self.camera_position + self._camera_front * self._move_horizontally
+        self.camera_position = self.camera_position + self.camera_front * self._move_horizontally
         self.build_look_at()
 
     def move_backwards(self):
-        self.camera_position = self.camera_position - self._camera_front * self._move_horizontally
+        self.camera_position = self.camera_position - self.camera_front * self._move_horizontally
         self.build_look_at()
 
     def strafe_left(self):
-        self.camera_position = self.camera_position - vector.normalize(self._camera_front ^ self._camera_up) * self._move_horizontally
+        self.camera_position = self.camera_position - vector.normalize(self.camera_front ^ self._camera_up) * self._move_horizontally
         self.build_look_at()
 
     def strafe_right(self):
-        self.camera_position = self.camera_position + vector.normalize(self._camera_front ^ self._camera_up) * self._move_horizontally
+        self.camera_position = self.camera_position + vector.normalize(self.camera_front ^ self._camera_up) * self._move_horizontally
         self.build_look_at()
 
     def strafe_up(self):
@@ -80,30 +80,30 @@ class Camera():
         self.build_look_at()
 
     def rotate_up(self):
-        self._camera_front.z -= float(self._rotate_vertically)
+        self.camera_front.z -= float(self._rotate_vertically)
         self.build_look_at()
 
     def rotate_down(self):
-        self._camera_front.z += float(self._rotate_vertically)
+        self.camera_front.z += float(self._rotate_vertically)
         self.build_look_at()
     
     def rotate_left(self):
         rotation = Quaternion.from_z_rotation(-2 * float(self._rotate_horizontally) * np.pi / 180)
-        self._camera_front = rotation * self._camera_front
+        self.camera_front = rotation * self.camera_front
         self.build_look_at()
 
     def rotate_right(self):
         rotation = Quaternion.from_z_rotation(2 * float(self._rotate_horizontally) * np.pi / 180)
-        self._camera_front = rotation * self._camera_front
+        self.camera_front = rotation * self.camera_front
         self.build_look_at()
 
     def slow_rotate_right(self):
         rotation = Quaternion.from_z_rotation(2 * .2 * np.pi / 180)
-        self._camera_front = rotation * self._camera_front
+        self.camera_front = rotation * self.camera_front
         self.build_look_at()
     
     def build_look_at(self):
-        self._cameras_target = (self.camera_position + self._camera_front)
+        self._cameras_target = (self.camera_position + self.camera_front)
         self.mat_lookat = Matrix44.look_at(
             self.camera_position,
             self._cameras_target,
@@ -239,21 +239,25 @@ class Tessellation(Example):
         vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
         self.vao = self.ctx.simple_vertex_array(self.prog, vbo, 'in_vert')
         
-
+        
         # Create a custom attribute name spec
         # so attribute names are not forced to follow gltf standard
         attr_names = AttributeNames(position='in_vert', texcoord_0='in_tex', normal='in_norm')
 
         #Object input
+        self.zprog = self.load_program('zebra.glsl')
+        self.zlight = self.zprog['Light']
+        self.zmvp = self.zprog['Mvp']
+
         self.obj = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
         self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
-        self.vao2 = self.obj.root_nodes[0].mesh.vao.instance(self.prog)
+        self.vao2 = self.obj.root_nodes[0].mesh.vao.instance(self.zprog)
 
         #Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
         
         # World scale (change to your heart's content)
-        self.camera.scale = 256
+        self.camera.scale = 256;
         
         self.states = {
             self.wnd.keys.W: False,    
@@ -338,15 +342,17 @@ class Tessellation(Example):
         self.ctx.clear(1.0, 1.0, 1.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
-        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes()) # pylint: disable=too-many-function-args
+        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes())
 
         self.mvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
         self.time.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
-        #self.vao.render(moderngl.PATCHES)
-        
-        #self.texture.use()
-        self.vao2.render()
+        self.vao.render(moderngl.PATCHES)
+
+        self.zmvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
+        self.zlight.write((self.camera.camera_position + self.camera.camera_front).astype('f4').tobytes())
+        self.texture.use()
+        self.vao2.render() #Uncomment after object loads
 
 
 
