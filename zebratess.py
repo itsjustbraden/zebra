@@ -214,7 +214,7 @@ class Tessellation(Example):
                     bool griddy = abs( floor(pos.x) - pos.x ) < 0.1;
                     griddy = griddy || (abs( floor(pos.y) - pos.y ) < 0.1);
                     f_color = f_color * float(griddy);
-                    //f_color = vec4(1.0,1.0,1.0,1.0); //Make color black & white
+                    f_color = vec4(1.0,1.0,1.0,1.0); //Make color black & white
                 }
             ''',
         )
@@ -335,7 +335,7 @@ class Tessellation(Example):
     def render(self, time, frame_time): #Creation of the world.
         self.move_camera()
 
-        self.ctx.clear(0.0, 0.0, 0.0)
+        self.ctx.clear(1.0, 1.0, 1.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
         self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes()) # pylint: disable=too-many-function-args
@@ -345,7 +345,8 @@ class Tessellation(Example):
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
         #self.vao.render(moderngl.PATCHES)
         
-        self.vao2.render() #Uncomment after object loads
+        #self.texture.use()
+        self.vao2.render()
 
 
 
