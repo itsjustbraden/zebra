@@ -1,5 +1,23 @@
 #!/usr/bin/env python3
-'''Simple example to tessellate a quad. Based upon ModernGL tesselate.py [sic] example.'''
+#Brady Kruse
+#bak225
+
+#Braden Wells
+#rbw214 
+
+'''
+Various Citations:
+
+1)  2D Noise based on Morgan McGuire @morgan3d
+    https://www.shadertoy.com/view/4dS3Wd
+
+2)  ModernGL template projects
+    https://github.com/moderngl/moderngl
+
+3) Dr. TJ's Tessellation Example Code
+(Thank you!)
+'''
+
 
 import numpy as np
 from pyrr import Matrix44, Quaternion, Vector3, vector
