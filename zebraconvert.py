@@ -3,6 +3,7 @@ import numpy as np
 from pyrr import Matrix44
 
 from ported._example import Example
+from moderngl_window.geometry.attributes import AttributeNames
 
 
 class CrateExample(Example):
@@ -11,51 +12,17 @@ class CrateExample(Example):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.prog = self.ctx.program(
-            vertex_shader='''
-                #version 330
-
-                uniform mat4 Mvp;
-
-                in vec3 in_position;
-                in vec3 in_normal;
-                in vec2 in_texcoord_0;
-
-                out vec3 v_vert;
-                out vec3 v_norm;
-                out vec2 v_text;
-
-                void main() {
-                    gl_Position = Mvp * vec4(in_position / 10.0, 1.0);
-                    v_vert = in_position / 10.0;
-                    v_norm = in_normal;
-                    v_text = in_texcoord_0;
-                }
-            ''',
-            fragment_shader='''
-                #version 330
-
-                uniform vec3 Light;
-                uniform sampler2D Texture;
-
-                in vec3 v_vert;
-                in vec3 v_norm;
-                in vec2 v_text;
-
-                out vec4 f_color;
-
-                void main() {
-                    float lum = clamp(dot(normalize(Light - v_vert), normalize(v_norm)), 0.0, 1.0) * 0.8 + 0.2;
-                    f_color = vec4(texture(Texture, v_text).rgb * lum, 1.0);
-                    //f_color = vec4(0.0, 0.0, 0.0, 1.0);
-                }
-            ''',
-        )
+        self.prog = self.load_program('zebra.glsl')
 
         self.mvp = self.prog['Mvp']
         self.light = self.prog['Light']
 
-        self.scene = self.load_scene('Zebra_OBJ.obj')
+
+        # Create a custom attribute name spec
+        # so attribute names are not forced to follow gltf standard
+        attr_names = AttributeNames(position='in_vert', texcoord_0='in_tex', normal='in_norm')
+
+        self.scene = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
         self.vao = self.scene.root_nodes[0].mesh.vao.instance(self.prog)
         self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
 
@@ -64,7 +31,7 @@ class CrateExample(Example):
         self.ctx.clear(1.0, 1.0, 1.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
-        camera_pos = (np.cos(angle) * 3.0, np.sin(angle) * 3.0, 2.0)
+        camera_pos = (np.cos(angle) * 1.0, np.sin(angle) * 1.0, 2.0)
 
         proj = Matrix44.perspective_projection(45.0, self.aspect_ratio, 0.1, 100.0)
         lookat = Matrix44.look_at(
