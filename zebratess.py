@@ -183,13 +183,14 @@ class Tessellation(Example):
 
                 uniform float time;
                 uniform vec2 camera_position;
+                uniform float scale;
 
                 in vec3 out_vert;
                 out vec4 f_color;
 
                 void main() {
                     f_color = vec4(sin(time*4), cos(time*4), .4, 1.0); //Change color over time
-                    float gridScale = 128.0;
+                    float gridScale = scale / 2.0;
                     vec2 pos = (out_vert.xy - fract(camera_position)) * gridScale;
                     bool griddy = abs( floor(pos.x) - pos.x ) < 0.1;
                     griddy = griddy || (abs( floor(pos.y) - pos.y ) < 0.1);
@@ -222,7 +223,7 @@ class Tessellation(Example):
         #Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
         
-        self.camera.scale = 128;
+        self.camera.scale = 512;
         
         self.states = {
             self.wnd.keys.W: False,    
