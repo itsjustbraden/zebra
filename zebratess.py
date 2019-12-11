@@ -14,8 +14,8 @@ Various Citations:
 2)  ModernGL template projects
     https://github.com/moderngl/moderngl
 
-3) Dr. TJ's Tessellation Example Code
-(Thank you!)
+3)  Dr. TJ's Tessellation Example Code
+    (Thank you!)
 '''
 
 
@@ -24,6 +24,7 @@ from pyrr import Matrix44, Quaternion, Vector3, vector
 
 import moderngl
 from ported._example import Example #Base class for our world
+from moderngl_window.geometry.attributes import AttributeNames
 
 class Camera():
 
