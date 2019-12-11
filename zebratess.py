@@ -190,7 +190,7 @@ class Tessellation(Example):
                 void main() {
                     f_color = vec4(sin(time*4), cos(time*4), .4, 1.0); //Change color over time
                     float gridScale = 128.0;
-                    vec3 pos = (out_vert - fract(camera_position)) * gridScale;
+                    vec2 pos = (out_vert.xy - fract(camera_position)) * gridScale;
                     bool griddy = abs( floor(pos.x) - pos.x ) < 0.1;
                     griddy = griddy || (abs( floor(pos.y) - pos.y ) < 0.1);
                     f_color = f_color * float(griddy);

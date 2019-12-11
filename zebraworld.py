@@ -134,7 +134,7 @@ class ZebraWorld(Example):
                 uniform vec2 camera_position;
 
                 in vec2 in_vert;
-                out vec2 v_text;
+                out vec3 out_vert;
 
                 float random (in vec2 st) {
                     return fract(sin(dot(st.xy,
