@@ -18,7 +18,7 @@ Various Citations:
     (Thank you!)
 '''
 
-
+# Here they come, it's the modules
 import numpy as np
 from pyrr import Matrix44, Quaternion, Vector3, vector
 
@@ -26,38 +26,50 @@ import moderngl
 from ported._example import Example #Base class for our world
 from moderngl_window.geometry.attributes import AttributeNames
 
-class Camera():
 
+# Camera class modified from simple_camera.py
+class Camera():
     def __init__(self, ratio):
-        self._zoom_step = 0.2 #Camera speeds
+        # Camera speeds
+        self._zoom_step = 0.2
         self._move_vertically = 0.001
         self._move_horizontally = 0.001
         self._rotate_horizontally = -0.02
         self._rotate_vertically = 0.02
 
+        # Angle of rotation
         self.angle = 0
+
+        # Distance back the camera moves
         self.dist = 0.1
 
+        # Projection? In my camera? It's more likely than you think
         self._field_of_view_degrees = 60.0
         self._z_near = 0.01
         self._z_far = 35
         self._ratio = ratio
         self.build_projection()
 
+        # What are you looking at? Huh?
+        # I'm looking at a zebra
         self.camera_position = Vector3([-.1, 0.03, -.06]) #Default camera values
         self.camera_front = Vector3([0.0, 1.0, 0.0])
         self._camera_up = Vector3([0.0, 0.0, -1.0])
         self._cameras_target = (self.camera_position + self.camera_front)
         self.build_look_at()
 
-    def zoom_in(self): #Possible movements
+    # What if you could like zoom in, but in real life? 
+    def zoom_in(self):
         self._field_of_view_degrees = self._field_of_view_degrees - self._zoom_step
         self.build_projection()
 
+    # Oh wait never mind you can just get closer
     def zoom_out(self):
         self._field_of_view_degrees = self._field_of_view_degrees + self._zoom_step
         self.build_projection()
 
+    # Do hot sine-cosine action on the angle to get x-y vectors of movement
+    #  Then scale it down because cos(0) == 1 and moving 1 in GL space is B A D
     def move_forward(self):
         self.camera_position = self.camera_position + Vector3([np.cos(self.angle),np.sin(self.angle), 0.0 ]) * self._move_horizontally
         self.build_look_at()
@@ -66,6 +78,7 @@ class Camera():
         self.camera_position = self.camera_position - Vector3([np.cos(self.angle),np.sin(self.angle), 0.0 ]) * self._move_horizontally
         self.build_look_at()
 
+    # Same as forwards and backwards, except add in a pretty little 90 degree turn
     def strafe_left(self):
         self.camera_position = self.camera_position - Vector3([np.cos(self.angle + np.pi / 2),np.sin(self.angle + np.pi / 2), 0.0 ]) * self._move_horizontally
         self.build_look_at()
@@ -74,6 +87,7 @@ class Camera():
         self.camera_position = self.camera_position + Vector3([np.cos(self.angle + np.pi / 2),np.sin(self.angle + np.pi / 2), 0.0 ]) * self._move_horizontally
         self.build_look_at()
 
+    # Thankfully, the up vector never changes, so we can just add/subtract that
     def strafe_up(self):
         self.camera_position = self.camera_position + self._camera_up * self._move_vertically
         self.build_look_at()
@@ -82,6 +96,11 @@ class Camera():
         self.camera_position = self.camera_position - self._camera_up * self._move_vertically
         self.build_look_at()
 
+    '''
+    # Oh, that's rotate-holm
+    # ...We don't go there anymore.
+    # (is that reference forced? i dunno)
+    # (we just decided these were too complex to add to the new rotation system we use)
     def rotate_up(self):
         self.camera_front.z -= float(self._rotate_vertically)
         self.build_look_at()
@@ -89,7 +108,9 @@ class Camera():
     def rotate_down(self):
         self.camera_front.z += float(self._rotate_vertically)
         self.build_look_at()
-    
+    '''
+
+    # The beauty of this system: just add or subtract to the angle!
     def rotate_left(self):
         self.angle += self._rotate_horizontally
         self.build_look_at()
@@ -97,28 +118,28 @@ class Camera():
     def rotate_right(self):
         self.angle -= self._rotate_horizontally
         self.build_look_at()
-
-
-        '''
-        rotation = Quaternion.from_z_rotation(2 * float(self._rotate_horizontally) * np.pi / 180)
-        self.camera_front = rotation * self.camera_front
-        self.build_look_at()
-        '''
-
+    
+    # Slow rotation for the auto spin/move
     def slow_rotate_right(self):
-        rotation = Quaternion.from_z_rotation(2 * .2 * np.pi / 180)
-        self.camera_front = rotation * self.camera_front
+        self.angle -= self._rotate_horizontally / 5
         self.build_look_at()
     
+    # Generate the look-at matrix with the following setup:
+    #   Camera_position is the look-at point
+    #   Camera_target is the eye point (just the position, except moved opposite the angle)
+    #   the up is up, up is always up, up up up up up up up
     def build_look_at(self):
         self._camera_dist = Vector3([np.cos(self.angle), np.sin(self.angle), 0]) * self.dist
         self.camera_target = self.camera_position - self._camera_dist
+
+        # Move camera up slightly to get over-shoulder view type deal
         self.camera_target.z -= 0.04
         self.mat_lookat = Matrix44.look_at(
             self.camera_target,
             self.camera_position,
             self._camera_up)
 
+    # Make a lovely projection matrix out of the stuff that they're always made of
     def build_projection(self):
         self.mat_projection = Matrix44.perspective_projection(
             self._field_of_view_degrees,
@@ -133,23 +154,23 @@ class Tessellation(Example):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        # Shaders for the terrain/world/floor/sludge
         self.prog = self.load_program('world.glsl')
         
         #Passing in of uniforms
         self.mvp = self.prog['Mvp']
         self.time = self.prog['time']
         self.camera_position = self.prog['camera_position']
-
         self.scale = self.prog['scale']
         
         # four vertices define a quad
         self.ctx.patch_vertices = 4
 
         vertices = np.array([
-            [-0.9, -0.9],
-            [ 0.9, -0.9],
-            [ 0.9,  0.9],
-            [-0.9,  0.9],
+            [-1.0, -1.0],
+            [ 1.0, -1.0],
+            [ 1.0,  1.0],
+            [-1.0,  1.0],
         ])
 
         vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
@@ -160,23 +181,27 @@ class Tessellation(Example):
         # so attribute names are not forced to follow gltf standard
         attr_names = AttributeNames(position='in_vert', texcoord_0='in_tex', normal='in_norm')
 
-        #Object input
+        # Shaders for zebra/car/whatever it takes
         self.zprog = self.load_program('zebra.glsl')
+
+        # Uniforms for that
         self.zlight = self.zprog['Light']
         self.zmvp = self.zprog['Mvp']
         self.zrotate = self.zprog['Rotate']
         self.ztime = self.zprog['time']
 
+        # Get our zebra in town
         self.obj = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
         self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
         self.vao2 = self.obj.root_nodes[0].mesh.vao.instance(self.zprog)
 
-        #Keybinds, camera setup.
+        # Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
         
         # World scale (change to your heart's content)
-        self.camera.scale = 256;
+        self.camera.scale = 256
         
+        # Wow that's a few keys, I tell ya what
         self.states = {
             self.wnd.keys.W: False,    
             self.wnd.keys.S: False,     
@@ -254,30 +279,45 @@ class Tessellation(Example):
         else:
             self.states[key] = False
 
-    def render(self, time, frame_time): #Creation of the world.
+    # It's time to actually see stuff!
+    def render(self, time, frame_time):
+
+        # Move our camera depending on keybinds
         self.move_camera()
 
+        # Black background, turn on depth
         self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
+        # Set our world scale for tessellation
         self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes())
 
+        # Put projection and look-at matrix into uniform
         self.mvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
+
+        # Setup time, camera_position into shaders
         self.time.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
+
+        # Tessellate that floor!
         self.vao.render(moderngl.PATCHES)
 
+        # ZEBRA TIME
+        # Put in projection, camera position (which we call light for some reason?), and the time
         self.zmvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
         self.zlight.write((self.camera.camera_position).astype('f4').tobytes())
         self.ztime.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
 
+        # We need to get our zebra looking the right way and also slightly lower than where he starts
         rotateMyZebra = Matrix44.from_translation([0, -0.05, 0])
         rotateMyZebra = Matrix44.from_x_rotation(np.pi / 2) * rotateMyZebra
         rotateMyZebra = Matrix44.from_z_rotation((np.pi / 2) - self.camera.angle) * rotateMyZebra
+        # Put that movement into the shader
         self.zrotate.write((rotateMyZebra).astype('f4').tobytes())
         
+        # Show us the zebra!
         self.texture.use()
-        self.vao2.render() #Uncomment after object loads
+        self.vao2.render()
 
 
 
