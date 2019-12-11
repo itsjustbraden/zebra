@@ -125,8 +125,8 @@ class Tessellation(Example):
         self.prog = self.ctx.program(
             vertex_shader='''
             #version 410 core
-            in vec2 in_pos;
-            void main() { gl_Position = vec4(in_pos, 0.0, 1.0); }
+            in vec2 in_vert;
+            void main() { gl_Position = vec4(in_vert, 0.0, 1.0); }
             ''',
             tess_control_shader='''
             #version 410 core
@@ -207,7 +207,7 @@ class Tessellation(Example):
                 out vec4 f_color;
 
                 void main() {
-                    f_color = vec4(sin(time*4), cos(time*4), .4, 1.0); //Change color over time
+                    f_color = vec4(sin(time*4), cos(time*4), .6, 1.0); //Change color over time
                     float gridScale = scale / 2.0;
                     vec2 pos = (out_vert.xy - fract(camera_position)) * gridScale;
                     bool griddy = abs( floor(pos.x) - pos.x ) < 0.1;
@@ -236,12 +236,23 @@ class Tessellation(Example):
         ])
 
         vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
-        self.vao = self.ctx.simple_vertex_array(self.prog, vbo, 'in_pos')
+        self.vao = self.ctx.simple_vertex_array(self.prog, vbo, 'in_vert')
+        
+
+        # Create a custom attribute name spec
+        # so attribute names are not forced to follow gltf standard
+        attr_names = AttributeNames(position='in_vert', texcoord_0='in_tex', normal='in_norm')
+
+        #Object input
+        self.obj = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
+        self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
+        self.vao2 = self.obj.root_nodes[0].mesh.vao.instance(self.prog)
 
         #Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
         
-        self.camera.scale = 256 #Change this to change amount of tesselation
+        # World scale (change to your heart's content)
+        self.camera.scale = 256;
         
         self.states = {
             self.wnd.keys.W: False,    
@@ -326,14 +337,14 @@ class Tessellation(Example):
         self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
-        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes()) # pylint: disable=too-many-function-args
+        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes())
 
         self.mvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
         self.time.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
-        self.vao.render(moderngl.PATCHES)
+        #self.vao.render(moderngl.PATCHES)
         
-        #self.vao2.render() Uncomment after object loads
+        self.vao2.render() #Uncomment after object loads
 
 
 
