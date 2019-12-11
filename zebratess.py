@@ -224,7 +224,7 @@ class Tessellation(Example):
                     bool griddy = abs( floor(pos.x) - pos.x ) < 0.1;
                     griddy = griddy || (abs( floor(pos.y) - pos.y ) < 0.1);
                     f_color = f_color * float(griddy);
-                    f_color = vec4(1.0,1.0,1.0,1.0); //Make color black & white
+                    //f_color = vec4(1.0,1.0,1.0,1.0); //Make color black & white
                 }
             ''',
         )
@@ -338,19 +338,19 @@ class Tessellation(Example):
 
 
     def key_event(self, key, action, modifiers):
-            if key not in self.states:
-                print(key, action)
-                return
+        if key not in self.states:
+            print(key, action)
+            return
 
-            if action == self.wnd.keys.ACTION_PRESS:
-                self.states[key] = True
-            else:
-                self.states[key] = False
+        if action == self.wnd.keys.ACTION_PRESS:
+            self.states[key] = True
+        else:
+            self.states[key] = False
 
     def render(self, time, frame_time): #Creation of the world.
         self.move_camera()
 
-        self.ctx.clear(1.0, 1.0, 1.0)
+        self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
         self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes())
@@ -360,7 +360,15 @@ class Tessellation(Example):
         self.camera_position.write(self.camera.camera_position.xy.astype('f4').tobytes())
         self.vao.render(moderngl.PATCHES)
 
+        
+        self.zmvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
+        self.zlight.write((self.camera.camera_position).astype('f4').tobytes())
 
+        rotateMyZebra = Matrix44.from_translation([0, -0.05, 0])
+        rotateMyZebra = Matrix44.from_x_rotation(np.pi / 2) * rotateMyZebra
+        rotateMyZebra = Matrix44.from_z_rotation((np.pi / 2) - self.camera.angle) * rotateMyZebra
+        self.zrotate.write((rotateMyZebra).astype('f4').tobytes())
+        
         self.texture.use()
         self.vao2.render() #Uncomment after object loads
 
