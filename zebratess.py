@@ -223,7 +223,7 @@ class Tessellation(Example):
         #Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
         
-        self.camera.scale = 512;
+        self.camera.scale = 256 #Change this to change amount of tesselation
         
         self.states = {
             self.wnd.keys.W: False,    
@@ -308,7 +308,7 @@ class Tessellation(Example):
         self.ctx.clear(0.0, 0.0, 0.0)
         self.ctx.enable(moderngl.DEPTH_TEST)
 
-        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes())
+        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes()) # pylint: disable=too-many-function-args
 
         self.mvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
         self.time.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
