@@ -26,6 +26,36 @@ import moderngl
 from ported._example import Example #Base class for our world
 from moderngl_window.geometry.attributes import AttributeNames
 
+# Noise algorithm
+#  Not quite working, unused
+def doRandom (st):
+    x = (np.sin( np.dot(st, [12.9898,78.233])) * 43758.5453123)
+    return abs(x - np.floor(x))
+
+def lerp(a, b, val):
+    out = b * val + a * (1 - val)
+    return out
+
+def noise (st):
+    st = np.array(st)
+    XYScale = 20.0
+    ZScale = 1.0 / 20.0
+
+    st = XYScale * st
+
+    i = np.floor(st)
+    f = abs(np.modf(st)[0])
+
+    a = doRandom(i)
+    b = doRandom(i + [1.0, 0.0])
+    c = doRandom(i + [0.0, 1.0])
+    d = doRandom(i + [1.0, 1.0])
+
+    u = f * f * ( 3.0 - (2.0 * f) )
+
+    val = lerp(a, b, u[0]) + (c - a) * u[1] * (1.0 - u[0]) + (d - b) * u[0] * u[1]
+
+    return abs(val * ZScale)
 
 # Camera class modified from simple_camera.py
 class Camera():
@@ -129,6 +159,11 @@ class Camera():
     #   Camera_target is the eye point (just the position, except moved opposite the angle)
     #   the up is up, up is always up, up up up up up up up
     def build_look_at(self):
+        #ground = noise(np.array(self.camera_position.xy)) - 0.02
+        ground = 0.0
+        if self.camera_position.z > ground:
+            self.camera_position.z = ground
+        
         self._camera_dist = Vector3([np.cos(self.angle), np.sin(self.angle), 0]) * self.dist
         self.camera_target = self.camera_position - self._camera_dist
 
@@ -147,7 +182,7 @@ class Camera():
             self._z_near,
             self._z_far)
 
-class Tessellation(Example):
+class Zebra(Example):
     title = "Zebra Land"
     gl_version = (4, 1)
 
@@ -191,9 +226,12 @@ class Tessellation(Example):
         self.ztime = self.zprog['time']
 
         # Get our zebra in town
-        self.obj = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
+        self.zebra = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
         self.texture = self.load_texture_2d('Zebra_skin_colors.jpg')
-        self.vao2 = self.obj.root_nodes[0].mesh.vao.instance(self.zprog)
+        self.vao2 = self.zebra.root_nodes[0].mesh.vao.instance(self.zprog)
+
+        # Car (brought to you by "Educational Purposes")
+        carDict = {}
 
         # Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
@@ -238,13 +276,13 @@ class Tessellation(Example):
 
             if self.states.get(self.wnd.keys.D):
                 self.camera.strafe_right()
-
+            '''
             if self.states.get(self.wnd.keys.UP):
                 self.camera.rotate_up()
 
             if self.states.get(self.wnd.keys.DOWN):
                 self.camera.rotate_down()
-
+            '''
             if self.states.get(self.wnd.keys.LEFT):
                 self.camera.rotate_left()
 
@@ -320,6 +358,5 @@ class Tessellation(Example):
         self.vao2.render()
 
 
-
 if __name__ == '__main__':
-    Tessellation.run()
+    Zebra.run()

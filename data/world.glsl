@@ -38,6 +38,11 @@ float random (in vec2 st) {
 }
 
 float noise (in vec2 st) {
+    float XYScale = 20.0;
+    float ZScale = 1.0 / 20.0;
+
+    st *= XYScale;
+
     vec2 i = floor(st);
     vec2 f = fract(st);
 
@@ -48,9 +53,10 @@ float noise (in vec2 st) {
 
     vec2 u = f*f*(3.0-2.0*f);
 
-    return mix(a, b, u.x) +
+    float val = mix(a, b, u.x) +
             (c - a)* u.y * (1.0 - u.x) +
             (d - b) * u.x * u.y;
+    return val * ZScale;
 }
 
 
@@ -62,11 +68,8 @@ void main() {
 
     vec4 Position = mix(p1, p2, sin(gl_TessCoord.y));
 
-
-    float XYScale = 20.0;
-    float ZScale = 1.0 / 20.0;
     Position.xy += camera_position;
-    Position.z = noise((Position.xy + camera_position - 0.5) * XYScale) * ZScale;
+    Position.z = noise(Position.xy + camera_position);
 
     out_vert = Position.xyz;
 

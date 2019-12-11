@@ -16,7 +16,7 @@ out vec3 v_norm;
 out vec2 v_text;
 
 void main() {
-    vec3 my_vert = (in_vert / 128.0);
+    vec3 my_vert = (in_vert / 192.0);
     my_vert = (Rotate * vec4(my_vert, 1.0)).xyz;
     gl_Position = Mvp * vec4(my_vert + Light, 1.0);
     v_vert = my_vert;
@@ -37,10 +37,17 @@ in vec2 v_text;
 out vec4 f_color;
 
 float random (in vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898,78.233)))* 43758.5453123);
+    return fract(sin(dot(st.xy,
+                        vec2(12.9898,78.233)))
+                * 43758.5453123);
 }
 
 float noise (in vec2 st) {
+    float XYScale = 20.0;
+    float ZScale = 1.0 / 20.0;
+
+    st *= XYScale;
+
     vec2 i = floor(st);
     vec2 f = fract(st);
 
@@ -51,9 +58,10 @@ float noise (in vec2 st) {
 
     vec2 u = f*f*(3.0-2.0*f);
 
-    return mix(a, b, u.x) +
+    float val = mix(a, b, u.x) +
             (c - a)* u.y * (1.0 - u.x) +
             (d - b) * u.x * u.y;
+    return val * ZScale;
 }
 
 void main() {
@@ -61,11 +69,8 @@ void main() {
     vec3 texcolor = texture(Texture, v_text).rgb;
     vec3 LightFR = v_vert;
     LightFR.x += 0.1;
-
-    float XYScale = 20.0;
-    float ZScale = 1.0 / 20.0;
     
-    float ground = noise((Light.xy) * XYScale) * ZScale;
+    float ground = noise(Light.xy);
     float dist = abs(Light.z - ground);
     dist *= dist * 100.0;
 
