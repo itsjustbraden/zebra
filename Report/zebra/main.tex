@@ -51,7 +51,7 @@ Importing the .obj files, we initially believed, would require a converter for t
 \\
 \indent{As part of the planning phase, we also spent time determining what tools to use. 
 \begin{enumerate}
-    \item Since Regl does not support tessellation, we had to find an OpenGL binding that does, which we discovered in the Python-based ModernGL \cite{b1}. ModernGL is poorly documented and not widely used, although it did provide an extensive collection of demos (see Figure \ref{fig:ModernGLDemo}, from which we often pulled code snippets.
+    \item Since Regl does not support tessellation, we had to find an OpenGL binding that does, which we discovered in the Python-based ModernGL \cite{b1}. ModernGL is poorly documented and not widely used, although it did provide an extensive collection of demos (see Figure \ref{fig:ModernGLDemo}), from which we often pulled code snippets.
     \item To obtain the random world, we found an equation known as Perlin Noise: a randomized gradient (so that, based on inputs, the random output changes gradually rather than suddenly). Luckily, glsl libraries already existed for implementing it \cite{b2}.
     \item Finally, and perhaps most importantly, we desired a very high-quality and free zebra model, which we found in the form of the low-poly Figure \ref{fig:ShittyZebra} \cite{b3}
 \end{enumerate}}
@@ -96,7 +96,7 @@ Once we achieved this, we then modified the fragment shader to loop through colo
     \label{fig:ColorfulWorld}
 \end{figure}
 
-\indent {Now that we had a stripped down, colored world, we next had to figure out how to implement the Perlin Noise equations in \cite{b2}. This ended up being quite easy--the equations are rather intuitive--so it took almost no time at all to modify them so that the x and y of each vertex is passed in, then a gradient z value is kicked out. This created a random world, but a finite one; once the camera left the box defined by {{-1,1}, {-1,1}}, the camera would fall off the world.}
+\indent {Now that we had a stripped down, colored world, we next had to figure out how to implement the Perlin Noise equations in \cite{b2}. This ended up being quite easy--the equations are rather intuitive--so it took almost no time at all to modify them so that the x and y of each vertex is passed in, then a gradient z value is kicked out. This created a random world, but a finite one; once the camera left the box defined by (-1,1), (-1,1), the camera would fall off the world.}
 \\
 \indent{We spent an embarrassing amount of time tinkering with how to make the world infinite, but also retaining previous environment (so that going backwards wouldn't create new z values for areas where the camera has already been). We spent time thinking about some kind of offset system, so the world actually moves instead of the camera, or a slice system, where the world only renders once the camera leaves its previous "slice." The answer ended up being incredibly simple: Perlin Noise works on a seed system, the coordinate (1,1) will always create the same z value. So, since Perlin Noise already worked like this, all we had to do was generate the world based on the camera coordinates rather than the vertex coordinates, effectively creating an infinite, retained world. The world now looked something like Figure \ref{fig:InfiniteWorld}}
 \begin{figure}[h]
@@ -173,7 +173,7 @@ Now that all of our objects were loaded, we decided to implement some very basic
     \label{fig:BasicLighting}
 \end{figure}
 \\
-\indent{Something not covered in Assignment 5 was light strength based on distance. We decided that this would neat to implement, so that as the zebra got lower and closer the ground, the light got stronger, and vice versa. Our theory was to simply take the object's z value, the ground's z value, subtract them, then scale the absolute value as necessary Again, we spent embarrassingly long on this, as it took a few hours to realize we were subtracting two unique variables that both held the object's z value because of some accidental redundant assignment. Once we finally realized this, we get the current effect as seen in Figure \ref{fig:CurrentLighting}.}
+\indent{Something not covered in Assignment 5 was light strength based on distance. We decided that this would be neat to implement, so that as the zebra got lower and closer the ground, the light got stronger, and vice versa. Our theory was to simply take the object's z value, the ground's z value, subtract them, then scale the absolute value as necessary Again, we spent embarrassingly long on this, as it took a few hours to realize we were subtracting two unique variables that both held the object's z value because of some accidental redundant assignment. Once we finally realized this, we get the current effect as seen in Figure \ref{fig:CurrentLighting}.}
 \begin{figure}[h]
     \centering
     \subfloat[The zebra far away from the grid]{{\includegraphics[width=5cm]{Images/FarLight.png} }}%
@@ -186,24 +186,24 @@ Now that all of our objects were loaded, we decided to implement some very basic
 \section{Conclusion and Future Works}
 As previously stated, this is the current status of our project:
 \begin{itemize}
-    \item{A procedurally generated, non-textured, infinite landscape}
-    \item{A working camera that tracks objects properly}
-    \item{Two scaled and textured, movable objects}
+    \item{A procedurally generated, non-textured, infinite landscape.}
+    \item{A working camera that tracks objects properly.}
+    \item{Two scaled and textured, movable objects.}
     \item{A very simple distance-based diffuse / ambient lighting model.}
 \end{itemize}
 Through the implementation of these four things, we have demonstrated a general overview of all the methods taught in this class through ModernGL.
 \indent{As with all computer programs, there is always significant room for improvement. For good practice, we will likely implement these for fun in the future.
 \begin{itemize}
-    \item {The lighting model is painfully basic. There is definite potential for a really beautiful specular effect that wouldn't be too incredibly complex to implement}
+    \item {The lighting model is painfully basic. There is definite potential for a really beautiful specular effect that wouldn't be too incredibly complex to implement.}
     \item {The camera does not support up or down rotation. This may or may not be very useful or relevant, but, nonetheless, could be implemented.}
     \item {There is significant artifacting occurring when the camera gets too far away from the grid.}
     \item {Upon starting and stopping movement, the color on the grid dims for a millisecond. We think this may be correlated with the artifacting occurring.}
     \item {We attempted to implement ground snapping (adding collision with the ground so the object cannot float through the grid) by replicating the glsl noise function in Python, but, for some reason, had small differences in our values. We think it has something to do with how Python handles floats. Instead, we simply made it impossible to go above 0 on the z-axis, so the object can slightly submerge in the grid.}
-    \item {The black sky is nice, but a skybox could complete the sci-fi aesthetic we were going for, and also opens up opportunity for reflection (especially on the Mini Cooper with windshields and such)}.
-    \item {We are unable to use alpha blending on the windshield of the Mini Cooper}
+    \item {The black sky is nice, but a skybox could complete the sci-fi aesthetic we were going for, and also opens up opportunity for reflection (especially on the Mini Cooper with windshields and such).}
+    \item {We were unable to use alpha blending on the windshield of the Mini Cooper, but hope to debug this.}
 \end{itemize}}
 \section*{Acknowledgment}
-The project members wish to express their thanks to Dr. TJ for his help and for teaching a very difficult, yet thorough and fair, computer graphics class (along with putting up with our stupid memey chicanery)
+The project members wish to express their thanks to Dr. TJ for his help and for teaching a very difficult, yet thorough and fair, computer graphics class (along with putting up with our stupid memey chicanery).
 
 \bibliography{biblio}
 \bibliographystyle{ieeetr}
