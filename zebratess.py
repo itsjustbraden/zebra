@@ -18,6 +18,16 @@ Various Citations:
 
 3)  Dr. TJ's Tessellation Example Code
     (Thank you!)
+
+CONTROLS:
+W/S to move forward/backward
+Q/E to move up/down
+A/D to strafe left/right
+Left and Right arrows to turn
+Z/X to zoom in/out
+T/Y to enable/disable automatic turning and movement
+K to swap models
+
 '''
 
 # Here they come, it's the modules
@@ -29,7 +39,7 @@ from ported._example import Example #Base class for our world
 from moderngl_window.geometry.attributes import AttributeNames # pylint: disable=no-name-in-module
 
 # Noise algorithm
-#  Not quite working, unused
+#  Not quite working, unused, you can skip this part
 def doRandom (st):
     x = (np.sin( np.dot(st, [12.9898,78.233])) * 43758.5453123)
     return abs(x - np.floor(x))
@@ -283,6 +293,8 @@ class Zebra(Example):
             self.wnd.keys.K: False,
         }
 
+    # Move_camera copied wholesale from simple_camera.py
+    # (except the zebra part)
     def move_camera(self):
             if self.states.get(self.wnd.keys.W):
                 self.camera.move_forward()
@@ -331,6 +343,9 @@ class Zebra(Example):
                 self.states[self.wnd.keys.W] = False
                 self.states[self.wnd.keys.I] = False
             
+            # If K is pressed, toggle that zebra!
+            # But also only trigger it once per press
+            # Else ye must face the horror of the transmogrifying zebra-car
             if self.states.get(self.wnd.keys.K):
                 if not self.zebraPressed:
                     self.zebraTime = not self.zebraTime
@@ -388,6 +403,7 @@ class Zebra(Example):
             # Put that movement into the shader
             self.zrotate.write((wheresMyCar).astype('f4').tobytes())
 
+            # Set our texture, then render every part of the car with the right color
             self.car["texture"].use()
             for i in self.carDict:
                 color = self.carDict[i]
