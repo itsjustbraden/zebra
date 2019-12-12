@@ -26,7 +26,7 @@ from pyrr import Matrix44, Quaternion, Vector3, vector
 
 import moderngl
 from ported._example import Example #Base class for our world
-from moderngl_window.geometry.attributes import AttributeNames
+from moderngl_window.geometry.attributes import AttributeNames # pylint: disable=no-name-in-module
 
 # Noise algorithm
 #  Not quite working, unused
@@ -360,7 +360,7 @@ class Zebra(Example):
         self.ctx.enable(moderngl.DEPTH_TEST)
 
         # Set our world scale for tessellation
-        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes())
+        self.scale.write(np.float32(self.camera.scale).astype('f4').tobytes()) # pylint: disable=too-many-function-args
 
         # Put projection and look-at matrix into uniform
         self.mvp.write((self.camera.mat_projection * self.camera.mat_lookat).astype('f4').tobytes())
@@ -378,7 +378,7 @@ class Zebra(Example):
         self.zlight.write((self.camera.camera_position).astype('f4').tobytes())
         self.ztime.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
 
-        self.zuse.write(np.float32(self.zebraTime).astype('f4').tobytes())
+        self.zuse.write(np.float32(self.zebraTime).astype('f4').tobytes()) # pylint: disable=too-many-function-args
         
         if not self.zebraTime:
             # Make the car look forwards properly
