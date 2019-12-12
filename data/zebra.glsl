@@ -10,13 +10,20 @@ in vec2 in_tex;
 
 uniform vec3 Light;
 uniform mat4 Rotate;
+uniform bool ZebraUse;
 
 out vec3 v_vert;
 out vec3 v_norm;
 out vec2 v_text;
 
 void main() {
-    vec3 my_vert = (in_vert / 192.0);
+    float zebraScale = 192.0;
+    float carScale = 192.0 * 20.0;
+
+    float scale = ZebraUse ? zebraScale : carScale;
+
+    vec3 my_vert = (in_vert / scale);
+
     my_vert = (Rotate * vec4(my_vert, 1.0)).xyz;
     gl_Position = Mvp * vec4(my_vert + Light, 1.0);
     v_vert = my_vert;
@@ -29,6 +36,7 @@ void main() {
 uniform vec3 Light;
 uniform sampler2D Texture;
 uniform float time;
+uniform vec3 color;
 
 in vec3 v_vert;
 in vec3 v_norm;
@@ -65,8 +73,10 @@ float noise (in vec2 st) {
 }
 
 void main() {
-
-    vec3 texcolor = texture(Texture, v_text).rgb;
+    vec3 texcolor = color.rgb;
+    if(texcolor == vec3(0.0)){
+        texcolor = texture(Texture, v_text).rgb;
+    }
     vec3 LightFR = v_vert;
     LightFR.x += 0.1;
     
@@ -74,7 +84,7 @@ void main() {
     float dist = abs(Light.z - ground);
     dist *= dist * 100.0;
 
-    float lum = clamp(dot(normalize(LightFR - v_vert), normalize(v_norm)), 0.0, 1.0) * 0.5 + 0.1;
+    float lum = clamp(dot(normalize(LightFR - Light), normalize(v_norm)), 0.0, 1.0) * 0.5 + 0.1;
     lum /= dist;
     lum = clamp(lum, 0.0, 1.0);
     vec3 ambient = vec3(1.0,1.0,1.0) * .3;
