@@ -214,7 +214,7 @@ class Zebra(Example):
         
         # Create a custom attribute name spec
         # so attribute names are not forced to follow gltf standard
-        attr_names = AttributeNames(position='in_vert', texcoord_0='in_tex', normal='in_norm')
+        attr_names = AttributeNames(position='in_vert', texcoord_0='in_tex', normal='in_norm', color_0 = "color")
 
         # Shaders for zebra/car/whatever it takes
         self.zprog = self.load_program('zebra.glsl')
@@ -222,8 +222,13 @@ class Zebra(Example):
         # Uniforms for that
         self.zlight = self.zprog['Light']
         self.zmvp = self.zprog['Mvp']
+        self.zuse = self.zprog['ZebraUse']
+        self.zcolor = self.zprog['color']
         self.zrotate = self.zprog['Rotate']
         self.ztime = self.zprog['time']
+
+        self.zebraTime = False
+        self.zebraPressed = False
 
         # Get our zebra in town
         self.zebra = self.load_scene('Zebra_OBJ.obj', attr_names=attr_names)
@@ -231,8 +236,25 @@ class Zebra(Example):
         self.vao2 = self.zebra.root_nodes[0].mesh.vao.instance(self.zprog)
 
         # Car (brought to you by "Educational Purposes")
-        carDict = {}
+        self.carDict = {
+            "mini_body.obj" : [0,0,0],
+            "mini_brakes.obj" : [0.75, 0.75, 0.75],
+            "mini_glass.obj" : [0.5, 0.5, 0.5],
+            "mini_interior.obj" : [0.33, 0.1, 0.02],
+            "mini_parts.obj" : [0.2, 0.2, 0.2],
+            "mini_rims.obj" : [0.95, 0.95, 0.93],
+            "mini_tires.obj" : [0.1, 0.1, 0.1],
+            "mini_underpart.obj" : [0,0,0],
+        }
 
+        # Load our car into a dictionary so that we can run through all the parts
+        self.car = {}
+        self.car["texture"] = self.load_texture_2d('mini_body_diffuse.png')
+        for i in self.carDict:
+            self.car[i] = {}
+            self.car[i]["model"] = self.load_scene(i, attr_names=attr_names)
+            self.car[i]["vao"] = self.car[i]["model"].root_nodes[0].mesh.vao.instance(self.zprog)
+        
         # Keybinds, camera setup.
         self.camera = Camera(self.aspect_ratio)
         
@@ -256,6 +278,7 @@ class Zebra(Example):
             self.wnd.keys.T: False,
             self.wnd.keys.I: False,
             self.wnd.keys.Y: False,
+            self.wnd.keys.K: False,
         }
 
     def move_camera(self):
@@ -305,6 +328,13 @@ class Zebra(Example):
             if self.states.get(self.wnd.keys.Y):
                 self.states[self.wnd.keys.W] = False
                 self.states[self.wnd.keys.I] = False
+            
+            if self.states.get(self.wnd.keys.K):
+                if not self.zebraPressed:
+                    self.zebraTime = not self.zebraTime
+                    self.zebraPressed = True
+            else:
+                self.zebraPressed = False
 
 
     def key_event(self, key, action, modifiers):
@@ -346,16 +376,33 @@ class Zebra(Example):
         self.zlight.write((self.camera.camera_position).astype('f4').tobytes())
         self.ztime.write(np.float32(time*0.2).astype('f4').tobytes()) # pylint: disable=too-many-function-args
 
-        # We need to get our zebra looking the right way and also slightly lower than where he starts
-        rotateMyZebra = Matrix44.from_translation([0, -0.05, 0])
-        rotateMyZebra = Matrix44.from_x_rotation(np.pi / 2) * rotateMyZebra
-        rotateMyZebra = Matrix44.from_z_rotation((np.pi / 2) - self.camera.angle) * rotateMyZebra
-        # Put that movement into the shader
-        self.zrotate.write((rotateMyZebra).astype('f4').tobytes())
+        self.zuse.write(np.float32(self.zebraTime).astype('f4').tobytes())
         
-        # Show us the zebra!
-        self.texture.use()
-        self.vao2.render()
+        if not self.zebraTime:
+            # Make the car look forwards properly
+            wheresMyCar = Matrix44.from_translation([0, 0, -0.02])
+            wheresMyCar = Matrix44.from_x_rotation(np.pi) * wheresMyCar
+            wheresMyCar = Matrix44.from_z_rotation((np.pi / 2) - self.camera.angle) * wheresMyCar
+            # Put that movement into the shader
+            self.zrotate.write((wheresMyCar).astype('f4').tobytes())
+
+            self.car["texture"].use()
+            for i in self.carDict:
+                color = self.carDict[i]
+                self.zcolor.write(np.array(color).astype('f4').tobytes())
+                self.car[i]["vao"].render()
+
+        else:
+            # We need to get our zebra looking the right way and also slightly lower than where he starts
+            rotateMyZebra = Matrix44.from_translation([0, -0.05, 0])
+            rotateMyZebra = Matrix44.from_x_rotation(np.pi / 2) * rotateMyZebra
+            rotateMyZebra = Matrix44.from_z_rotation((np.pi / 2) - self.camera.angle) * rotateMyZebra
+            # Put that movement into the shader
+            self.zrotate.write((rotateMyZebra).astype('f4').tobytes())
+
+            # Show us the zebra!
+            self.texture.use()
+            self.vao2.render()
 
 
 if __name__ == '__main__':
