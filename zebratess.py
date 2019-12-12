@@ -10,6 +10,8 @@ Various Citations:
 
 1)  2D Noise based on Morgan McGuire @morgan3d
     https://www.shadertoy.com/view/4dS3Wd
+    Introduced to us by Book of Shaders
+    https://thebookofshaders.com/11/
 
 2)  ModernGL template projects
     https://github.com/moderngl/moderngl
